@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>秘密の花占い</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        #result {
+            font-size: 3em;
+            margin: 30px auto;
+            font-weight: bold;
+            min-height: 60px; /* 結果表示エリアの確保 */
+        }
+        .fortune-text {
+            /* 通常の結果（好き/嫌い） */
+            color: #d9534f; 
+        }
+        .final-message {
+            /* 最終結果 */
+            color: #337ab7; 
+            font-size: 2em;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        #fortune-button {
+            background-color: #5cb85c; /* 緑色 */
+            color: white;
+        }
+        #fortune-button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        #reset-button {
+            background-color: #f0ad4e; /* オレンジ色 */
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌹 秘密の花占い 🌹</h1>
+    <p>花びらの枚数は秘密です。ドキドキしながらちぎりましょう。</p>
+    
+    <button id="fortune-button" onclick="fortune()">花びらをちぎる</button>
+    <button id="reset-button" onclick="resetFortune()">最初から（新しい花）</button>
+
+    <div id="result">占い開始！</div>
+
+    <script>
+        // 占いの結果の配列： [0]が「嫌い」、[1]が「好き」
+        const fortunes = ["嫌い", "好き"];
+
+        let totalPetals;     // 花びらの総数 (5〜10枚、秘密)
+        let petalsChipped;   // ちぎった花びらの枚数 (0からスタート)
+
+        /**
+         * 5〜10の間のランダムな整数を生成する関数
+         */
+        function getRandomPetalCount() {
+            // (10 - 5 + 1) = 6 をかけて 0〜5.99... の範囲にする
+            // 5 を足して 5〜10.99... の範囲にする
+            return Math.floor(Math.random() * 6) + 5;
+        }
+
+        /**
+         * 占いの初期設定を行う関数
+         */
+        function initializeFortune() {
+            // ランダムに花びらの総数を設定
+            totalPetals = getRandomPetalCount();
+            petalsChipped = 0;
+            
+            // 画面をリセット
+            document.getElementById('result').textContent = "花びらをちぎってください...";
+            document.getElementById('result').className = ''; // クラスをリセット
+            
+            // ボタンを有効化
+            document.getElementById('fortune-button').disabled = false;
+            document.getElementById('fortune-button').textContent = "花びらをちぎる";
+        }
+
+        /**
+         * 花占いを行う関数
+         */
+        function fortune() {
+            const resultElement = document.getElementById('result');
+            const fortuneButton = document.getElementById('fortune-button');
+            
+            // 既に最後の花びらをちぎり終えていたら何もしない
+            if (petalsChipped >= totalPetals) {
+                return;
+            }
+
+            // 最後の花びらをちぎる場合
+            if (petalsChipped === totalPetals - 1) {
+                // 最後の結果を取得
+                const finalResult = fortunes[petalsChipped % fortunes.length];
+                
+                // 最終結果を表示
+                resultElement.innerHTML = `<span class="final-message">🎉 最後の結果は... ${finalResult}！ 🎉</span>`;
+                resultElement.className = 'final-message';
+                
+                // カウントを増やして、次回からはボタンが押せないようにする
+                petalsChipped++;
+                fortuneButton.disabled = true;
+                fortuneButton.textContent = "終了";
+                
+                return;
+            }
+
+            // 最後の花びらではない場合
+            
+            // ちぎった枚数 (0から始まる) を2で割った余り (0か1) で結果を取得
+            const currentFortune = fortunes[petalsChipped % fortunes.length];
+            
+            // 結果を画面に表示
+            resultElement.textContent = currentFortune;
+            resultElement.className = 'fortune-text';
+            
+            // ちぎった花びらの枚数を増やす
+            petalsChipped++;
+        }
+
+        /**
+         * 占いの状態をリセットする関数
+         */
+        function resetFortune() {
+            document.getElementById('result').textContent = "新しい花を用意しました...";
+            // 新しい花びらの総数を設定して初期化
+            initializeFortune();
+        }
+
+        // ページがロードされたときに最初に実行
+        window.onload = initializeFortune;
+
+    </script>
+
+</body>
+</html>
